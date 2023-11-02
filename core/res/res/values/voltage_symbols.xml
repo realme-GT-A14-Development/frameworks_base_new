@@ -102,6 +102,10 @@
          causes a poor experience. -->
     <java-symbol type="bool" name="config_fingerprintWakeAndUnlock" />
 
+    <!-- Whether device implements proximity sensor based checks to preventAdd commentMore actions
+         accidental unlocks when the screen is off. -->
+    <java-symbol type="bool" name="config_proximityCheckOnFpsUnlock" />
+
     <!-- Whether device has physical tri state switch -->
     <java-symbol type="bool" name="config_hasAlertSlider" />
 

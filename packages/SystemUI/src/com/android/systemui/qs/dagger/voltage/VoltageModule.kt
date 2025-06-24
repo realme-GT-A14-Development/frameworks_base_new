@@ -16,6 +16,7 @@
 
 package com.android.systemui.qs.dagger.voltage
 
+import android.content.Context
 import com.android.systemui.qs.QsEventLogger
 import com.android.systemui.qs.pipeline.shared.TileSpec
 import com.android.systemui.qs.shared.model.TileCategory
@@ -43,6 +44,19 @@ interface VoltageModule {
     @StringKey(RefreshRateTile.TILE_SPEC)
     fun bindRefreshRateTile(refreshRateTile: RefreshRateTile): QSTileImpl<*>
 
+    /** Inject CellularTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(CellularTile.TILE_SPEC)
+    fun bindCellularTile(cellularTile: CellularTile): QSTileImpl<*>
+
+
+    /** Inject WifiTile into tileMap in QSModule */
+    @Binds
+    @IntoMap
+    @StringKey(WifiTile.TILE_SPEC)
+    fun bindWifiTile(wifiTile: WifiTile): QSTileImpl<*>
+
     companion object {
         @Provides
         @IntoMap
@@ -58,17 +72,37 @@ interface VoltageModule {
                 category = TileCategory.DISPLAY
             )
         }
+
+        @Provides
+        @IntoMap
+        @StringKey(CellularTile.TILE_SPEC)
+        fun provideCellularTileConfig(uiEventLogger: QsEventLogger): QSTileConfig {
+            return QSTileConfig(
+                tileSpec = TileSpec.create(CellularTile.TILE_SPEC),
+                uiConfig = QSTileUIConfig.Resource(
+                    iconRes = R.drawable.ic_swap_vert,
+                    labelRes = R.string.quick_settings_cellular_detail_title
+                ),
+                instanceId = uiEventLogger.getNewInstanceId(),
+                category = TileCategory.CONNECTIVITY
+            )
+        }
+
+        @Provides
+        @IntoMap
+        @StringKey(WifiTile.TILE_SPEC)
+        fun provideWifiTileConfig(uiEventLogger: QsEventLogger, context: Context): QSTileConfig {
+            return QSTileConfig(
+                tileSpec = TileSpec.create(WifiTile.TILE_SPEC),
+		uiConfig = QSTileUIConfig.Resource(
+                    iconRes = context.resources.getIdentifier(
+                        "ic_signal_wifi_transient_animation", "drawable", "android"
+                    ),
+                    labelRes = R.string.quick_settings_wifi_label
+                ),
+                instanceId = uiEventLogger.getNewInstanceId(),
+                category = TileCategory.CONNECTIVITY
+            )                       
+        }
     }
-
-    /** Inject CellularTile into tileMap in QSModule */
-    @Binds
-    @IntoMap
-    @StringKey(CellularTile.TILE_SPEC)
-    fun bindCellularTile(cellularTile: CellularTile): QSTileImpl<*>
-
-    /** Inject WifiTile into tileMap in QSModule */
-    @Binds
-    @IntoMap
-    @StringKey(WifiTile.TILE_SPEC)
-    fun bindWifiTile(wifiTile: WifiTile): QSTileImpl<*>
 }

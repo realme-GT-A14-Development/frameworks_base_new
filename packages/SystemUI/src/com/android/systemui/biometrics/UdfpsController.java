@@ -26,6 +26,9 @@ import static android.hardware.biometrics.BiometricRequestConstants.REASON_ENROL
 import static android.hardware.biometrics.BiometricRequestConstants.REASON_ENROLL_FIND_SENSOR;
 
 import static com.android.internal.util.LatencyTracker.ACTION_UDFPS_ILLUMINATE;
+
+import static android.hardware.biometrics.BiometricFingerprintConstants.FINGERPRINT_ACQUIRED_VENDOR;
+
 import static com.android.internal.util.Preconditions.checkNotNull;
 import static com.android.systemui.classifier.Classifier.UDFPS_AUTHENTICATION;
 
@@ -81,6 +84,7 @@ import com.android.systemui.biometrics.udfps.NormalizedTouchData;
 import com.android.systemui.biometrics.udfps.SinglePointerTouchProcessor;
 import com.android.systemui.biometrics.udfps.TouchProcessor;
 import com.android.systemui.biometrics.udfps.TouchProcessorResult;
+import com.android.systemui.biometrics.ui.view.UdfpsTouchOverlay;
 import com.android.systemui.biometrics.ui.viewmodel.DefaultUdfpsTouchOverlayViewModel;
 import com.android.systemui.biometrics.ui.viewmodel.DeviceEntryUdfpsTouchOverlayViewModel;
 import com.android.systemui.bouncer.domain.interactor.AlternateBouncerInteractor;
@@ -222,6 +226,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
     private boolean mOnFingerDown;
     private boolean mAttemptedToDismissKeyguard;
     private final Set<Callback> mCallbacks = new HashSet<>();
+    private final int mUdfpsVendorCode;
 
     @VisibleForTesting
     public static final VibrationAttributes UDFPS_VIBRATION_ATTRIBUTES =
@@ -323,7 +328,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         @Override
         public void onAcquired(
                 int sensorId,
-                @BiometricFingerprintConstants.FingerprintAcquired int acquiredInfo
+                @BiometricFingerprintConstants.FingerprintAcquired int acquiredInfo, int vendorCode
         ) {
             if (isUltrasonic()) {
                 if (acquiredInfo == FINGERPRINT_ACQUIRED_START) {
@@ -354,6 +359,16 @@ public class UdfpsController implements DozeReceiver, Dumpable {
                     unconfigureDisplay(view);
                     tryAodSendFingerUp();
                 });
+            } else {
+                boolean acquiredVendor = acquiredInfo == FINGERPRINT_ACQUIRED_VENDOR;
+                if (!acquiredVendor || (!mStatusBarStateController.isDozing() && mScreenOn)) {
+                    return;
+                }
+                if (vendorCode == mUdfpsVendorCode) {
+                    mPowerManager.wakeUp(mSystemClock.uptimeMillis(),
+                            PowerManager.WAKE_REASON_GESTURE, TAG);
+                    onAodInterrupt(0, 0, 0, 0);
+                }
             }
         }
 
@@ -778,6 +793,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
 
         udfpsHapticsSimulator.setUdfpsController(this);
         udfpsShell.setUdfpsOverlayController(mUdfpsOverlayController);
+        mUdfpsVendorCode = mContext.getResources().getInteger(com.android.systemui.res.R.integer.config_udfpsVendorCode);
     }
 
     /**
@@ -865,8 +881,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
         if (!isOptical()) {
             return;
         }
-        if (mUdfpsDisplayMode != null) {
-            mUdfpsDisplayMode.disable(null);
+        UdfpsTouchOverlay udfpsView = (UdfpsTouchOverlay) view;
+        if (udfpsView.isDisplayConfigured()) {
+            udfpsView.unconfigureDisplay();
         }
     }
 
@@ -1073,7 +1090,7 @@ public class UdfpsController implements DozeReceiver, Dumpable {
             if (mIgnoreRefreshRate) {
                 dispatchOnUiReady(requestId);
             } else {
-                    mUdfpsDisplayMode.enable(() -> dispatchOnUiReady(requestId));
+                ((UdfpsTouchOverlay) view).configureDisplay(() -> dispatchOnUiReady(requestId));
             }
         }
 

@@ -253,12 +253,7 @@ constructor(
             val marginBetweenSmartspaceAndNotification =
                 context.resources.getDimensionPixelSize(
                     R.dimen.keyguard_status_view_bottom_margin
-                ) +
-                    if (context.resources.getBoolean(R.bool.config_use_large_screen_shade_header)) {
-                        largeScreenHeaderHelperLazy.get().getLargeScreenHeaderHeight()
-                    } else {
-                        0
-                    }
+                )
 
             if (dateWeatherBelowSmallClock) {
                 val dateWeatherSmartspaceHeight =

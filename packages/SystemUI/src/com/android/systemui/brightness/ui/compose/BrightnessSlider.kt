@@ -76,6 +76,7 @@ import com.android.app.tracing.coroutines.launchTraced as launch
 import com.android.compose.modifiers.padding
 import com.android.compose.theme.LocalAndroidColorScheme
 import com.android.compose.ui.graphics.drawInOverlay
+import com.android.internal.graphics.ColorUtils
 import com.android.systemui.Flags
 import com.android.systemui.biometrics.Utils.toBitmap
 import com.android.systemui.brightness.shared.model.GammaBrightness
@@ -85,6 +86,7 @@ import com.android.systemui.brightness.ui.compose.Dimensions.IconPadding
 import com.android.systemui.brightness.ui.compose.Dimensions.IconSize
 import com.android.systemui.brightness.ui.compose.Dimensions.SliderBackgroundFrameSize
 import com.android.systemui.brightness.ui.compose.Dimensions.SliderBackgroundRoundedCorner
+import com.android.systemui.brightness.ui.compose.Dimensions.SliderTrackHeight
 import com.android.systemui.brightness.ui.compose.Dimensions.SliderTrackRoundedCorner
 import com.android.systemui.brightness.ui.compose.Dimensions.ThumbTrackGapSize
 import com.android.systemui.brightness.ui.viewmodel.BrightnessSliderViewModel
@@ -97,6 +99,7 @@ import com.android.systemui.haptics.slider.compose.ui.SliderHapticsViewModel
 import com.android.systemui.lifecycle.rememberViewModel
 import com.android.systemui.qs.ui.compose.borderOnFocus
 import com.android.systemui.res.R
+import com.android.systemui.util.CustomAndroidColorScheme
 import com.android.systemui.utils.PolicyRestriction
 import platform.test.motion.compose.values.MotionTestValueKey
 import platform.test.motion.compose.values.motionTestValues
@@ -212,7 +215,7 @@ fun BrightnessSlider(
             SliderDefaults.Thumb(
                 interactionSource = interactionSource,
                 enabled = enabled,
-                thumbSize = DpSize(4.dp, 52.dp),
+                thumbSize = DpSize(4.dp, 68.dp),
                 colors = colors,
             )
         },
@@ -257,7 +260,7 @@ fun BrightnessSlider(
                             iconInactiveAlphaAnimatable.value exportAs
                                 BrightnessSliderMotionTestKeys.InactiveIconAlpha
                         }
-                        .height(40.dp)
+                        .height(SliderTrackHeight)
                         .drawWithContent {
                             drawContent()
 
@@ -421,10 +424,11 @@ data class ContainerColors(val idleColor: Color, val mirrorColor: Color) {
 
 private object Dimensions {
     val SliderBackgroundFrameSize = DpSize(10.dp, 6.dp)
-    val SliderBackgroundRoundedCorner = 24.dp
-    val SliderTrackRoundedCorner = 12.dp
-    val IconSize = DpSize(28.dp, 28.dp)
-    val IconPadding = 6.dp
+    val SliderBackgroundRoundedCorner = 36.dp
+    val SliderTrackHeight = 56.dp
+    val SliderTrackRoundedCorner = 28.dp
+    val IconSize = DpSize(24.dp, 24.dp)
+    val IconPadding = 17.dp
     val ThumbTrackGapSize = 6.dp
 }
 
@@ -450,7 +454,7 @@ object BrightnessSliderMotionTestKeys {
 private fun colors(): SliderColors {
     return SliderDefaults.colors()
         .copy(
-            inactiveTrackColor = LocalAndroidColorScheme.current.surfaceEffect2,
+            inactiveTrackColor = CustomAndroidColorScheme.current.shadeTileColor,
             activeTickColor = MaterialTheme.colorScheme.onPrimary,
             inactiveTickColor = MaterialTheme.colorScheme.onSurface,
         )

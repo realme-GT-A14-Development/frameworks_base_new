@@ -711,12 +711,12 @@
     <dimen name="qs_corner_radius">28dp</dimen>
     <dimen name="qs_tile_height">80dp</dimen>
     <dimen name="qs_tile_margin_horizontal">8dp</dimen>
-    <dimen name="qs_tile_margin_vertical">@dimen/qs_tile_margin_horizontal</dimen>
+    <dimen name="qs_tile_margin_vertical">20dp</dimen>
     <dimen name="qs_tile_margin_top_bottom">4dp</dimen>
     <dimen name="qs_brightness_margin_top">8dp</dimen>
     <dimen name="qs_brightness_margin_bottom">16dp</dimen>
     <dimen name="qqs_layout_margin_top">16dp</dimen>
-    <dimen name="qqs_layout_padding_bottom">24dp</dimen>
+    <dimen name="qqs_layout_padding_bottom">8dp</dimen>
     <item name="qqs_expand_clock_scale" format="float" type="dimen">2.57</item>
 
     <!-- Most of the time it should be the same as notification_side_paddings as it's vertically
@@ -769,7 +769,7 @@
     <dimen name="new_qs_header_non_clickable_element_height">24sp</dimen>
 
     <dimen name="qs_footer_padding">20dp</dimen>
-    <dimen name="qs_footers_margin_bottom">8dp</dimen>
+    <dimen name="qs_footers_margin_bottom">0dp</dimen>
 
     <dimen name="segmented_button_spacing">0dp</dimen>
     <dimen name="borderless_button_radius">2dp</dimen>
